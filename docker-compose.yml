@@ -1,0 +1,11 @@
+services:
+  gotenberg:
+    image: gotenberg:local # Use the pre-built local image
+    ports:
+      - "3000:3000"
+    command:
+      - gotenberg
+      - --pdfengines-disable-routes=true
+      - --pdfengines-convert-engines=qpdf,exiftool
+      - --pdfengines-split-engines=pdfcpu,qpdf
+      - --pdfengines-merge-engines=qpdf,pdfcpu
