@@ -7,6 +7,17 @@ help: ## Show the help
 .PHONY: it
 it: build build-tests ## Initialize the development environment
 
+GOLANG_VERSION=1.23
+DOCKER_REGISTRY=
+DOCKER_REPOSITORY=gotenberg
+GOTENBERG_VERSION=local
+GOTENBERG_USER_GID=1001
+GOTENBERG_USER_UID=1001
+NOTO_COLOR_EMOJI_VERSION=v2.047 # See https://github.com/googlefonts/noto-emoji/releases.
+PDFTK_VERSION=v3.3.3 # See https://gitlab.com/pdftk-java/pdftk/-/releases - Binary package.
+PDFCPU_VERSION=v0.8.1 # See https://github.com/pdfcpu/pdfcpu/releases.
+GOLANGCI_LINT_VERSION=v1.61.0 # See https://github.com/golangci/golangci-lint/releases.
+
 .PHONY: build
 build: ## Build the Gotenberg's Docker image
 	docker build \
@@ -17,8 +28,8 @@ build: ## Build the Gotenberg's Docker image
 	--build-arg NOTO_COLOR_EMOJI_VERSION=$(NOTO_COLOR_EMOJI_VERSION) \
 	--build-arg PDFTK_VERSION=$(PDFTK_VERSION) \
 	--build-arg PDFCPU_VERSION=$(PDFCPU_VERSION) \
-	-t $(DOCKER_REGISTRY)/$(DOCKER_REPOSITORY):$(GOTENBERG_VERSION) \
-	-f $(DOCKERFILE) $(DOCKER_BUILD_CONTEXT)
+	-t $(DOCKER_REPOSITORY):$(GOTENBERG_VERSION) \
+	-f build/Dockerfile .
 
 GOTENBERG_GRACEFUL_SHUTDOWN_DURATION=30s
 API_PORT=3000
@@ -64,9 +75,9 @@ LOG_LEVEL=info
 LOG_FORMAT=auto
 LOG_FIELDS_PREFIX=
 PDFENGINES_ENGINES=
-PDFENGINES_MERGE_ENGINES=qpdf,pdfcpu,pdftk
-PDFENGINES_SPLIT_ENGINES=pdfcpu,qpdf,pdftk
 PDFENGINES_FLATTEN_ENGINES=qpdf
+PDFENGINES_MERGE_ENGINES=qpdf,pdfcpu
+PDFENGINES_SPLIT_ENGINES=pdfcpu,qpdf
 PDFENGINES_CONVERT_ENGINES=libreoffice-pdfengine
 PDFENGINES_READ_METADATA_ENGINES=exiftool
 PDFENGINES_WRITE_METADATA_ENGINES=exiftool

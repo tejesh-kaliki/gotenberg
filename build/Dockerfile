@@ -63,11 +63,11 @@ ARG NOTO_COLOR_EMOJI_VERSION
 ARG PDFTK_VERSION
 
 LABEL org.opencontainers.image.title="Gotenberg" \
-      org.opencontainers.image.description="A Docker-powered stateless API for PDF files." \
-      org.opencontainers.image.version="$GOTENBERG_VERSION" \
-      org.opencontainers.image.authors="Julien Neuhart <neuhart.julien@gmail.com>" \
-      org.opencontainers.image.documentation="https://gotenberg.dev" \
-      org.opencontainers.image.source="https://github.com/gotenberg/gotenberg"
+    org.opencontainers.image.description="A Docker-powered stateless API for PDF files." \
+    org.opencontainers.image.version="$GOTENBERG_VERSION" \
+    org.opencontainers.image.authors="Julien Neuhart <neuhart.julien@gmail.com>" \
+    org.opencontainers.image.documentation="https://gotenberg.dev" \
+    org.opencontainers.image.source="https://github.com/gotenberg/gotenberg"
 
 RUN \
     # Create a non-root user.
@@ -81,8 +81,7 @@ RUN \
     # Install system dependencies required for the next instructions or debugging.
     # Note: tini is a helper for reaping zombie processes.
     apt-get update -qq &&\
-    apt-get upgrade -yqq &&\
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends curl gnupg tini python3 default-jre-headless &&\
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends curl gnupg tini python3 &&\
     # Cleanup.
     # Note: the Debian image does automatically a clean after each install thanks to a hook.
     # Therefore, there is no need for apt-get clean.
@@ -149,52 +148,51 @@ RUN \
     /bin/bash -c \
     'set -e &&\
     if [[ "$(dpkg --print-architecture)" == "amd64" ]]; then \
-      curl https://dl.google.com/linux/linux_signing_key.pub | apt-key add - &&\
-      echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list &&\
-      apt-get update -qq &&\
-      apt-get upgrade -yqq &&\
-      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends --allow-unauthenticated google-chrome-stable &&\
-      mv /usr/bin/google-chrome-stable /usr/bin/chromium; \
+    curl https://dl.google.com/linux/linux_signing_key.pub | apt-key add - &&\
+    echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | tee /etc/apt/sources.list.d/google-chrome.list &&\
+    apt-get update -qq &&\
+    apt-get upgrade -yqq &&\
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends --allow-unauthenticated google-chrome-stable &&\
+    mv /usr/bin/google-chrome-stable /usr/bin/chromium; \
     else \
-      apt-get update -qq &&\
-      apt-get upgrade -yqq &&\
-      DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends chromium; \
+    apt-get update -qq &&\
+    apt-get upgrade -yqq &&\
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends chromium; \
     fi' &&\
     # Verify installation.
     chromium --version &&\
     # Cleanup.
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN \
-    # Install LibreOffice & unoconverter.
-    echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list &&\
-    apt-get update -qq &&\
-    apt-get upgrade -yqq &&\
-    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends -t bookworm-backports libreoffice &&\
-    curl -Ls https://raw.githubusercontent.com/gotenberg/unoconverter/v0.0.1/unoconv -o /usr/bin/unoconverter &&\
-    chmod +x /usr/bin/unoconverter &&\
-    # unoconverter will look for the Python binary, which has to be at version 3.
-    ln -s /usr/bin/python3 /usr/bin/python &&\
-    # Verify installations.
-    libreoffice --version &&\
-    unoconverter --version &&\
-    # Cleanup.
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# RUN \
+#     # Install LibreOffice & unoconverter.
+#     echo "deb http://deb.debian.org/debian bookworm-backports main" >> /etc/apt/sources.list &&\
+#     apt-get update -qq &&\
+#     DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends -t bookworm-backports libreoffice &&\
+#     curl -Ls https://raw.githubusercontent.com/gotenberg/unoconverter/v0.0.1/unoconv -o /usr/bin/unoconverter &&\
+#     chmod +x /usr/bin/unoconverter &&\
+#     # unoconverter will look for the Python binary, which has to be at version 3.
+#     ln -s /usr/bin/python3 /usr/bin/python &&\
+#     # Verify installations.
+#     libreoffice --version &&\
+#     unoconverter --version &&\
+#     # Cleanup.
+#     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN \
     # Install PDFtk, QPDF & ExifTool (PDF engines).
     # See https://github.com/gotenberg/gotenberg/pull/273.
-    curl -o /usr/bin/pdftk-all.jar "https://gitlab.com/api/v4/projects/5024297/packages/generic/pdftk-java/$PDFTK_VERSION/pdftk-all.jar" &&\
-    chmod a+x /usr/bin/pdftk-all.jar &&\
-    echo '#!/bin/bash\n\nexec java -jar /usr/bin/pdftk-all.jar "$@"' > /usr/bin/pdftk && \
-    chmod +x /usr/bin/pdftk &&\
+    # curl -o /usr/bin/pdftk-all.jar "https://gitlab.com/api/v4/projects/5024297/packages/generic/pdftk-java/$PDFTK_VERSION/pdftk-all.jar" &&\
+    # chmod a+x /usr/bin/pdftk-all.jar &&\
+    # echo '#!/bin/bash\n\nexec java -jar /usr/bin/pdftk-all.jar "$@"' > /usr/bin/pdftk && \
+    # chmod +x /usr/bin/pdftk &&\
     apt-get update -qq &&\
     apt-get upgrade -yqq &&\
     DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends qpdf exiftool &&\
     # See https://github.com/nextcloud/docker/issues/380.
     mkdir -p /usr/share/man/man1 &&\
     # Verify installations.
-    pdftk --version &&\
+    # pdftk --version &&\
     qpdf --version &&\
     exiftool --version &&\
     # Cleanup.
@@ -211,6 +209,9 @@ COPY --from=pdfcpu-binary-stage /home/pdfcpu /usr/bin/
 
 # Copy the Gotenberg binary from the gotenberg-binary-stage.
 COPY --from=gotenberg-binary-stage /home/gotenberg /usr/bin/
+
+# User defined fonts
+COPY fonts/* /usr/local/share/fonts/
 
 # Environment variables required by modules or else.
 ENV CHROMIUM_BIN_PATH=/usr/bin/chromium
